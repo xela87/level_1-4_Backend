@@ -1,0 +1,58 @@
+body {
+    font-family: "Roboto Condensed", sans-serif;
+    background: gainsboro;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.area {
+    margin: 15px auto;
+    width: 70%;
+    padding: 20px;
+    background: darkgrey;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    border-radius: 5px;
+}
+
+#usersTable1 {
+    margin: 15px auto;
+    width: 70%;
+}
+
+h1, h2, table {
+    margin: 0 auto;
+    text-align: center;
+    width: inherit;
+    padding: 10px;
+}
+
+table, th {
+    border: 1px #9e9e9e solid;;
+    border-collapse: collapse;
+    text-align: left;
+    padding-left: 10px;
+}
+
+td {
+    border-left: 1px #9e9e9e solid;
+    border-right: 1px #9e9e9e solid;
+    padding-left: 10px;
+}
+
+thead > tr {
+    background: #e2e2e2ff
+}
+
+tr {
+    background: rgb(255,255,255)
+}
+
+.dark-row {
+    background: rgb(239,239,239)
+}
+
+table tbody tr:hover, table thead th:hover {
+    background-color: rgb(203, 203, 203)
+}
