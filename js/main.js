@@ -1,14 +1,16 @@
-// Configuration of table for local data
+
+    /** Configuration of table for local data */
 const configLocal = {
     parent: '#usersTable',
     columns: [
+        {title: '№', value: 'num'},
         {title: 'Ім`я', value: 'name'},
         {title: 'Прізвище', value: 'surname'},
         {title: 'Вік', value: 'age'},
     ],
 };
 
-// Configuration of table for remote request
+    /** Configuration of table for remote request */
 const configForAPI = {
     parent: '#usersTable',
     columns: [
@@ -21,7 +23,7 @@ const configForAPI = {
     apiUrl: 'https://mock-api.shpp.me/okhokhlov/users',
 }
 
-// Data
+    /** Local data */
 const users = [
     {id: 30050, name: 'Василь', surname: 'Петров', age: 12},
     {id: 30051, name: 'Петро', surname: 'Васильєв', age: 15},
@@ -31,10 +33,12 @@ const users = [
     {id: 30055, name: 'Катерина', surname: 'Сковорода', age: 29},
 ];
 
-let getData = async (url) =>{
+    /** Getting data from server */
+
+let getData = async (url) => {
     const response = await fetch(url);
-    if(!response.ok){
-        throw new Error (`Error in ${url}, with status ${response}`)
+    if (!response.ok) {
+        throw new Error(`Error in ${url}, with status ${response}`)
     }
     return await response.json()
 }
@@ -43,64 +47,67 @@ function DataTable(config, data) {
     let tableArea = document.querySelector(config.parent)
     let table = document.createElement('table')
 
-    // Create head of table
-    let tableHeadBlock = document.createElement('thead')
-    let headRow = document.createElement('tr')
-    for (let i = 0; i < config.columns.length; i++) {
-        let th = document.createElement('th');
-        th.innerText = config.columns[i].title;
-        headRow.appendChild(th);
-    }
-    tableHeadBlock.appendChild(headRow)
-    table.appendChild(tableHeadBlock)
+    /** Create head of table */
+    table.appendChild(createTableHead(config))
 
-    // Create body of table
-    let tableBodyBlock = document.createElement('tbody')
-    if(!data) {
-        tableBodyBlock = fillTableBodyRemoteData(config)
+    /** Create body of table */
+    if (!data) {
+        table.appendChild(fillTableBodyRemoteData(config))
     } else {
-        tableBodyBlock = fillTableBodyLocalData(config,data)
+        table.appendChild(fillTableBodyLocalData(config, data))
     }
-    table.appendChild(tableBodyBlock)
     tableArea.appendChild(table)
 }
 
+function createTableHead(config) {
+    let thead = document.createElement('thead')
+    let hr = document.createElement('tr')
+    for (let i = 0; i < config.columns.length; i++) {
+        let th = document.createElement('th');
+        th.innerText = config.columns[i].title;
+        hr.appendChild(th);
+    }
+    thead.appendChild(hr)
+    return thead
+}
+
 function fillTableBodyRemoteData(config) {
-    let tableBodyBlock = document.createElement('tbody')
+    let tbody = document.createElement('tbody')
     for (let i = 1; i <= 50; i++) {
         getData(config.apiUrl).then((data) => {
-            let tableRow = document.createElement('tr')
+            let tr = document.createElement('tr')
             for (let j = 0; j < config.columns.length; j++) {
-                tableRow.insertCell().innerText = `${data.data[i][config.columns[j].value]}`
+                tr.insertCell().innerText = `${data.data[i][config.columns[j].value]}`
             }
             if (i % 2 !== 0) {
-                tableRow.classList.add('dark-row');
+                tr.classList.add('dark-row');
             }
-            tableBodyBlock.appendChild(tableRow)
+            tbody.appendChild(tr)
         })
     }
-    return tableBodyBlock
+    return tbody
 }
 
-function fillTableBodyLocalData (config, data) {
-    let tableBodyBlock = document.createElement('tbody')
+function fillTableBodyLocalData(config, data) {
+    let tbody = document.createElement('tbody')
     for (let i = 0; i < data.length; i++) {
-            let tableRow = document.createElement('tr')
-            for (let j = 0; j < config.columns.length; j++) {
-                tableRow.insertCell().innerText = `${data[i][config.columns[j].value]}`
-            }
-            if (i % 2 !== 0) {
-                tableRow.classList.add('dark-row');
-            }
-            tableBodyBlock.appendChild(tableRow)
+        let tr = document.createElement('tr')
+        tr.insertCell().innerText = `${i + 1}`
+        for (let j = 1; j < config.columns.length; j++) {
+            tr.insertCell().innerText = `${data[i][config.columns[j].value]}`
+        }
+        if (i % 2 !== 0) {
+            tr.classList.add('dark-row');
+        }
+        tbody.appendChild(tr)
     }
-    return tableBodyBlock
+    return tbody
 }
 
+    /** getting data from server */
 
-// Create my table
-// getting data from server
 DataTable(configForAPI);
 
-// getting data from local array
+    /** getting data from local array */
+
 //DataTable(configLocal, users);
