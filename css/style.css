@@ -7,7 +7,7 @@ body {
 
 .area {
     margin: 15px auto;
-    width: 70%;
+    width: 80%;
     padding: 20px;
     background: darkgrey;
     display: flex;
@@ -16,9 +16,25 @@ body {
     border-radius: 5px;
 }
 
+#addUser {
+    margin: 0 auto;
+    width: 80%;
+    font-size: 16px;
+    font-weight: 600;
+    height: 2em;
+    background-color: rgba(112,169,99,0.69);
+    border: 0;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+#addUser:hover {
+    background-color: #3ca932;
+}
+
 #usersTable1 {
     margin: 15px auto;
-    width: 70%;
+    width: 80%;
 }
 
 h1, h2, table {
@@ -33,6 +49,7 @@ table, th {
     border-collapse: collapse;
     text-align: left;
     padding-left: 10px;
+    table-layout: auto;
 }
 
 td {
@@ -46,13 +63,31 @@ thead > tr {
 }
 
 tr {
-    background: rgb(255,255,255)
+    background: rgb(255, 255, 255)
 }
 
 .dark-row {
-    background: rgb(239,239,239)
+    background: rgb(239, 239, 239)
 }
 
 table tbody tr:hover, table thead th:hover {
     background-color: rgb(203, 203, 203)
+}
+
+tr td:last-child {
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.delUser {
+    background-color: rgba(169,25,16,0.51);
+    border-radius: 3px;
+    border: 0;
+    width: 90%;
+    font-size: 14px;
+}
+
+.delUser:hover {
+    background-color: red;
 }

@@ -1,5 +1,4 @@
-
-    /** Configuration of table for local data */
+/** Configuration of table for local data */
 const configLocal = {
     parent: '#usersTable',
     columns: [
@@ -10,11 +9,10 @@ const configLocal = {
     ],
 };
 
-    /** Configuration of table for remote request */
+/** Configuration of table for remote request */
 const configForAPI = {
     parent: '#usersTable',
     columns: [
-        {title: '№', value: 'id'},
         {title: 'Ім`я', value: 'name'},
         {title: 'Прізвище', value: 'surname'},
         {title: 'День народження', value: 'birthday'},
@@ -23,7 +21,7 @@ const configForAPI = {
     apiUrl: 'https://mock-api.shpp.me/okhokhlov/users',
 }
 
-    /** Local data */
+/** Local data */
 const users = [
     {id: 30050, name: 'Василь', surname: 'Петров', age: 12},
     {id: 30051, name: 'Петро', surname: 'Васильєв', age: 15},
@@ -33,7 +31,7 @@ const users = [
     {id: 30055, name: 'Катерина', surname: 'Сковорода', age: 29},
 ];
 
-    /** Getting data from server */
+/** Getting data from server */
 
 let getData = async (url) => {
     const response = await fetch(url);
@@ -43,12 +41,31 @@ let getData = async (url) => {
     return await response.json()
 }
 
+let addButton = document.createElement('button')
+addButton.innerText = 'Додати нового користувача'
+addButton.id = 'addUser'
+
+let tableArea = document.querySelector(configForAPI.parent)
+tableArea.appendChild(addButton)
+
+
+addItem = async (url, data) => {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {"Content-type": "application/json"},
+        body: JSON.stringify(data)
+    });
+    if (!response.ok) {
+        throw new Error(`Error in ${url}, with status ${response}`)
+    }
+}
+
 function DataTable(config, data) {
     let tableArea = document.querySelector(config.parent)
     let table = document.createElement('table')
 
     /** Create head of table */
-    table.appendChild(createTableHead(config))
+    table.appendChild(createTableHead(config, data))
 
     /** Create body of table */
     if (!data) {
@@ -59,31 +76,64 @@ function DataTable(config, data) {
     tableArea.appendChild(table)
 }
 
-function createTableHead(config) {
+function createTableHead(config, data) {
     let thead = document.createElement('thead')
     let hr = document.createElement('tr')
-    for (let i = 0; i < config.columns.length; i++) {
-        let th = document.createElement('th');
-        th.innerText = config.columns[i].title;
-        hr.appendChild(th);
+
+    if (data) {
+        for (let i = 0; i < config.columns.length; i++) {
+            let th = document.createElement('th');
+            th.innerText = config.columns[i].title;
+            hr.appendChild(th);
+        }
+    } else {
+        for (let i = 0; i <= config.columns.length+1; i++) {
+            let th = document.createElement('th');
+            if (i === 0) {
+                th.innerText = "№";
+                hr.appendChild(th);
+            } else if (i <= config.columns.length) {
+                th.innerText = config.columns[i-1].title;
+                hr.appendChild(th);
+            } else {
+                th.innerText = `Дії`
+                hr.appendChild(th);
+            }
+        }
     }
     thead.appendChild(hr)
     return thead
 }
 
 function fillTableBodyRemoteData(config) {
+    let counter = 1;
     let tbody = document.createElement('tbody')
     for (let i = 1; i <= 50; i++) {
         getData(config.apiUrl).then((data) => {
             let tr = document.createElement('tr')
-            for (let j = 0; j < config.columns.length; j++) {
-                tr.insertCell().innerText = `${data.data[i][config.columns[j].value]}`
+            tr.insertCell().innerText = `${counter}`
+                for (let j = 0; j < config.columns.length; j++) {
+                    tr.insertCell().innerText = `${data.data[i][config.columns[j].value]}`
+                }
+                let button = document.createElement('button')
+                button.classList.add('delUser')
+                button.innerHTML = `&times`
+                button.addEventListener("click", async () => {
+                    const response = await fetch(`${config.apiUrl}` + '/' + `${i}`, {method: "DELETE"})
+                    if (!response.ok) {
+                        throw new Error(`Error in ${config.apiUrl}, with status ${response}`)
+                    }
+                    window.location.reload()
+                })
+                tr.insertCell().appendChild(button);
+
+                if (i % 2 !== 0) {
+                    tr.classList.add('dark-row');
+                }
+                tbody.appendChild(tr)
+            counter++;
             }
-            if (i % 2 !== 0) {
-                tr.classList.add('dark-row');
-            }
-            tbody.appendChild(tr)
-        })
+        )
     }
     return tbody
 }
@@ -104,10 +154,10 @@ function fillTableBodyLocalData(config, data) {
     return tbody
 }
 
-    /** getting data from server */
+/** getting data from server */
 
 DataTable(configForAPI);
 
-    /** getting data from local array */
+/** getting data from local array */
 
 //DataTable(configLocal, users);
