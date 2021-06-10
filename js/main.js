@@ -57,17 +57,21 @@ addButton.onclick = () => {
             tr.insertCell()
         }
         if (i < configForAPI.columns.length) {
-            tr.insertCell().innerHTML = `<input placeholder="${configForAPI.columns[i].title}">`
+            tr.insertCell().innerHTML = `<input 
+                                        id="in_${configForAPI.columns[i].value}" 
+                                        placeholder="${configForAPI.columns[i].title}">`
         } else {
             let button = document.createElement('button')
             button.classList.add('addUser')
             button.id = 'addNewUser'
-            button.innerHTML = `&#128504`
+            button.innerHTML = `Додати`
             button.addEventListener("click", async () => {
+                let data = getNewUser(i)
+                console.log(data)
                 const response = await fetch(configForAPI.apiUrl, {
                     method: 'POST',
                     headers: {"Content-type": "application/json"},
-                    //body: JSON.stringify(data)
+                    body: JSON.stringify(data)
                 });
                 if (!response.ok) {
                     throw new Error(`Error in ${configForAPI.apiUrl}, with status ${response}`)
@@ -78,19 +82,14 @@ addButton.onclick = () => {
         }
     }
     head.appendChild(tr)
-
 }
-//
-// addItem = async (url, data) => {
-//     const response = await fetch(url, {
-//         method: 'POST',
-//         headers: {"Content-type": "application/json"},
-//         body: JSON.stringify(data)
-//     });
-//     if (!response.ok) {
-//         throw new Error(`Error in ${url}, with status ${response}`)
-//     }
-// }
+
+function getNewUser(index) {
+     return {id: index, name: `${document.getElementById('in_name').value}`,
+         surname: `${document.getElementById('in_surname').value}`,
+         birthday: `${document.getElementById('in_birthday').value}`,
+         avatar: `${document.getElementById('in_avatar').value}`,}
+}
 
 function DataTable(config, data) {
     let tableArea = document.querySelector(config.parent)
@@ -139,7 +138,7 @@ function createTableHead(config, data) {
 function fillTableBodyRemoteData(config) {
     let counter = 1, greyRowCounter = 1;
     let tbody = document.createElement('tbody')
-    for (let i = 1; i <= 50; i++) {
+    for (let i = 1; i <= 150; i++) {
         getData(config.apiUrl).then((data) => {
                 let tr = document.createElement('tr')
                 tr.insertCell().innerText = `${counter}`
@@ -152,7 +151,7 @@ function fillTableBodyRemoteData(config) {
                 }
                 let button = document.createElement('button')
                 button.classList.add('delUser')
-                button.innerHTML = `&times`
+                button.innerHTML = `Видалити`
                 button.addEventListener("click", async () => {
                     const response = await fetch(`${config.apiUrl}` + '/' + `${i}`, {method: "DELETE"})
                     if (!response.ok) {
