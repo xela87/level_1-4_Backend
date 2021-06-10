@@ -43,22 +43,54 @@ let getData = async (url) => {
 
 let addButton = document.createElement('button')
 addButton.innerText = 'Додати нового користувача'
-addButton.id = 'addUser'
+addButton.id = 'addUserForm'
 
 let tableArea = document.querySelector(configForAPI.parent)
 tableArea.appendChild(addButton)
 
-
-addItem = async (url, data) => {
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {"Content-type": "application/json"},
-        body: JSON.stringify(data)
-    });
-    if (!response.ok) {
-        throw new Error(`Error in ${url}, with status ${response}`)
+addButton.onclick = () => {
+    let head = document.querySelector('thead')
+    let tr = document.createElement('tr');
+    tr.id = 'newDataRow'
+    for (let i = 0; i <= configForAPI.columns.length; i++) {
+        if (i === 0) {
+            tr.insertCell()
+        }
+        if (i < configForAPI.columns.length) {
+            tr.insertCell().innerHTML = `<input placeholder="${configForAPI.columns[i].title}">`
+        } else {
+            let button = document.createElement('button')
+            button.classList.add('addUser')
+            button.id = 'addNewUser'
+            button.innerHTML = `&#128504`
+            button.addEventListener("click", async () => {
+                const response = await fetch(configForAPI.apiUrl, {
+                    method: 'POST',
+                    headers: {"Content-type": "application/json"},
+                    //body: JSON.stringify(data)
+                });
+                if (!response.ok) {
+                    throw new Error(`Error in ${configForAPI.apiUrl}, with status ${response}`)
+                }
+                window.location.reload()
+            })
+            tr.insertCell().appendChild(button);
+        }
     }
+    head.appendChild(tr)
+
 }
+//
+// addItem = async (url, data) => {
+//     const response = await fetch(url, {
+//         method: 'POST',
+//         headers: {"Content-type": "application/json"},
+//         body: JSON.stringify(data)
+//     });
+//     if (!response.ok) {
+//         throw new Error(`Error in ${url}, with status ${response}`)
+//     }
+// }
 
 function DataTable(config, data) {
     let tableArea = document.querySelector(config.parent)
@@ -79,7 +111,6 @@ function DataTable(config, data) {
 function createTableHead(config, data) {
     let thead = document.createElement('thead')
     let hr = document.createElement('tr')
-
     if (data) {
         for (let i = 0; i < config.columns.length; i++) {
             let th = document.createElement('th');
@@ -87,13 +118,13 @@ function createTableHead(config, data) {
             hr.appendChild(th);
         }
     } else {
-        for (let i = 0; i <= config.columns.length+1; i++) {
+        for (let i = 0; i <= config.columns.length + 1; i++) {
             let th = document.createElement('th');
             if (i === 0) {
                 th.innerText = "№";
                 hr.appendChild(th);
             } else if (i <= config.columns.length) {
-                th.innerText = config.columns[i-1].title;
+                th.innerText = config.columns[i - 1].title;
                 hr.appendChild(th);
             } else {
                 th.innerText = `Дії`
@@ -106,14 +137,18 @@ function createTableHead(config, data) {
 }
 
 function fillTableBodyRemoteData(config) {
-    let counter = 1;
+    let counter = 1, greyRowCounter = 1;
     let tbody = document.createElement('tbody')
     for (let i = 1; i <= 50; i++) {
         getData(config.apiUrl).then((data) => {
-            let tr = document.createElement('tr')
-            tr.insertCell().innerText = `${counter}`
+                let tr = document.createElement('tr')
+                tr.insertCell().innerText = `${counter}`
                 for (let j = 0; j < config.columns.length; j++) {
-                    tr.insertCell().innerText = `${data.data[i][config.columns[j].value]}`
+                    if (data.data[i]) {
+                        tr.insertCell().innerText = `${data.data[i][config.columns[j].value]}`
+                    } else {
+                        return
+                    }
                 }
                 let button = document.createElement('button')
                 button.classList.add('delUser')
@@ -127,11 +162,12 @@ function fillTableBodyRemoteData(config) {
                 })
                 tr.insertCell().appendChild(button);
 
-                if (i % 2 !== 0) {
+                if (greyRowCounter % 2 !== 0) {
                     tr.classList.add('dark-row');
                 }
                 tbody.appendChild(tr)
-            counter++;
+                greyRowCounter++;
+                counter++;
             }
         )
     }

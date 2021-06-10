@@ -16,7 +16,7 @@ body {
     border-radius: 5px;
 }
 
-#addUser {
+#addUserForm {
     margin: 0 auto;
     width: 80%;
     font-size: 16px;
@@ -28,7 +28,7 @@ body {
     border-top-right-radius: 3px;
 }
 
-#addUser:hover {
+#addUserForm:hover, .addUser:hover {
     background-color: #3ca932;
 }
 
@@ -80,14 +80,22 @@ tr td:last-child {
     padding-right: 10px;
 }
 
-.delUser {
+.delUser, .addUser {
     background-color: rgba(169,25,16,0.51);
     border-radius: 3px;
     border: 0;
-    width: 90%;
+    width: 100%;
     font-size: 14px;
 }
 
 .delUser:hover {
     background-color: red;
+}
+
+.addUser {
+    background-color: rgba(112,169,99,0.69);
+}
+
+input {
+    width: 90%;
 }
