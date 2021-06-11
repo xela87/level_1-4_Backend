@@ -19,6 +19,7 @@ const configForAPI = {
         {title: 'Аватар', value: 'avatar'},
     ],
     apiUrl: 'https://mock-api.shpp.me/okhokhlov/users',
+    //apiUrl: 'https://mock-api.shpp.me/gbondar/users',
 }
 
 /** Local data */
@@ -41,63 +42,30 @@ let getData = async (url) => {
     return await response.json()
 }
 
-let addButton = document.createElement('button')
-addButton.innerText = 'Додати нового користувача'
-addButton.id = 'addUserForm'
 
-let tableArea = document.querySelector(configForAPI.parent)
-tableArea.appendChild(addButton)
 
-addButton.onclick = () => {
-    let head = document.querySelector('thead')
-    let tr = document.createElement('tr');
-    tr.id = 'newDataRow'
-    for (let i = 0; i <= configForAPI.columns.length; i++) {
-        if (i === 0) {
-            tr.insertCell()
-        }
-        if (i < configForAPI.columns.length) {
-            tr.insertCell().innerHTML = `<input 
-                                        id="in_${configForAPI.columns[i].value}" 
-                                        placeholder="${configForAPI.columns[i].title}">`
-        } else {
-            let button = document.createElement('button')
-            button.classList.add('addUser')
-            button.id = 'addNewUser'
-            button.innerHTML = `Додати`
-            button.addEventListener("click", async () => {
-                let data = getNewUser(i)
-                console.log(data)
-                const response = await fetch(configForAPI.apiUrl, {
-                    method: 'POST',
-                    headers: {"Content-type": "application/json"},
-                    body: JSON.stringify(data)
-                });
-                if (!response.ok) {
-                    throw new Error(`Error in ${configForAPI.apiUrl}, with status ${response}`)
-                }
-                window.location.reload()
-            })
-            tr.insertCell().appendChild(button);
-        }
+function getNewUser() {
+    let name = document.getElementById('in_name').value
+    let surname = document.getElementById('in_surname').value
+    let birthday = document.getElementById('in_birthday').value
+    let avatar = document.getElementById('in_avatar').value
+    if (!avatar || !birthday || !surname || !name) {
+        alert('Please enter values')
+        return null
     }
-    head.appendChild(tr)
-}
-
-function getNewUser(index) {
-     return {id: index, name: `${document.getElementById('in_name').value}`,
-         surname: `${document.getElementById('in_surname').value}`,
-         birthday: `${document.getElementById('in_birthday').value}`,
-         avatar: `${document.getElementById('in_avatar').value}`,}
+    return {name: `${name}`, surname: `${surname}`, birthday: `${birthday}`, avatar: `${avatar}`,}
 }
 
 function DataTable(config, data) {
     let tableArea = document.querySelector(config.parent)
     let table = document.createElement('table')
+    let addButton = document.createElement('button')
+    addButton.innerText = 'Додати нового користувача'
+    addButton.id = 'addUserForm'
 
     /** Create head of table */
     table.appendChild(createTableHead(config, data))
-
+    tableArea.appendChild(addButton)
     /** Create body of table */
     if (!data) {
         table.appendChild(fillTableBodyRemoteData(config))
@@ -105,6 +73,51 @@ function DataTable(config, data) {
         table.appendChild(fillTableBodyLocalData(config, data))
     }
     tableArea.appendChild(table)
+
+    addButton.onclick = () => {
+        let head = document.querySelector('thead')
+        let tr = document.createElement('tr');
+        tr.id = 'newDataRow'
+        for (let i = 0; i <= configForAPI.columns.length; i++) {
+            if (i === 0) {
+                tr.insertCell()
+            }
+            if (i < configForAPI.columns.length) {
+                configForAPI.columns[i].value === 'birthday' ?
+                    tr.insertCell().innerHTML = `<input
+                                        required
+                                        type="date"
+                                        name="${configForAPI.columns[i].value}"
+                                        id="in_${configForAPI.columns[i].value}" 
+                                        placeholder="${configForAPI.columns[i].title}">` :
+                    tr.insertCell().innerHTML = `<input
+                                        required
+                                        name="${configForAPI.columns[i].value}"
+                                        id="in_${configForAPI.columns[i].value}" 
+                                        placeholder="${configForAPI.columns[i].title}">`
+
+            } else {
+                let button = document.createElement('button')
+                button.classList.add('addUser')
+                button.id = 'addNewUser'
+                button.innerHTML = `Додати`
+                button.addEventListener("click", async () => {
+                    let data = getNewUser()
+                    const response = await fetch(configForAPI.apiUrl, {
+                        method: 'POST',
+                        headers: {"Content-type": "application/json"},
+                        body: JSON.stringify(data)
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Error in ${configForAPI.apiUrl}, with status ${response}`)
+                    }
+                    window.location.reload()
+                })
+                tr.insertCell().appendChild(button);
+            }
+        }
+        head.appendChild(tr)
+    }
 }
 
 function createTableHead(config, data) {
@@ -154,16 +167,11 @@ function fillTableBodyRemoteData(config) {
                 button.innerHTML = `Видалити`
                 button.addEventListener("click", async () => {
                     const response = await fetch(`${config.apiUrl}` + '/' + `${i}`, {method: "DELETE"})
-                    if (!response.ok) {
-                        throw new Error(`Error in ${config.apiUrl}, with status ${response}`)
-                    }
+                    if (!response.ok) throw new Error(`Error in ${config.apiUrl}, with status ${response}`)
                     window.location.reload()
                 })
                 tr.insertCell().appendChild(button);
-
-                if (greyRowCounter % 2 !== 0) {
-                    tr.classList.add('dark-row');
-                }
+                if (greyRowCounter % 2 !== 0) tr.classList.add('dark-row')
                 tbody.appendChild(tr)
                 greyRowCounter++;
                 counter++;
